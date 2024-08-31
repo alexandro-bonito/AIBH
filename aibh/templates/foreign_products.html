@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIBH Market - Pour une communauté en bonne santé</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="{% static 'logo.png' %}" alt="AIBH Market Logo">
+        </div>
+        <div style="box-shadow: -5px 5px 10px rgba(255, 69, 0, 0.5); " class="menu-icon" id="menu-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+        <style>
+            @keyframes menu-icon {
+              0% {
+                transform: scale(1);
+              }
+              50% {
+                transform: scale(1.1);
+              }
+              100% {
+                transform: scale(1);
+              }
+            }
+          
+            .menu-icon {
+              box-shadow: -5px 5px 12px rgba(255, 69, 0, 0.5);
+              animation: heartbeat 1s infinite;
+            }
+
+            .messages {
+    margin: 20px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.badge {
+    color: #a3f806;
+    font-size: 1em;
+    padding: 0 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 60px;
+    position: absolute;
+    border: none;
+    top: -10px;
+    right: -10px;
+    font-weight: bold;
+}
+
+          </style>
+        <nav>
+            <ul>
+                <!-- Accueil -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:index' %}"><i class="fa fa-home"></i> Accueil</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#a-propos"><i class="fa fa-info-circle"></i> À propos</a></li>
+                    </ul>
+                </li>
+                
+                <!-- Espace Bien-être -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:bienetre' %}"><i class="fa fa-leaf"></i> Espace Bien-être</a>
+                </li>
+                
+                <!-- Market place -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:panier_view' %}" style="position: relative; display: inline-block; text-decoration: none;">
+                        <i class="fa fa-shopping-cart"></i> Panier
+                        <span class="badge">{{ panier_count }}</span> <!-- Affiche le nombre total d'articles -->
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="{% url 'aibh:user_profile_view' %}"><i class="fa fa-user"></i> Compte</a>
+                    <ul class="dropdown-menu decal">
+                        <li><a href="{% url 'aibh:signin' %}"><i class="fa fa-user-plus"></i>Se connecter</a></li>
+                        <li><a href="{% url 'aibh:signup' %}"><i class="fa fa-sign-in-alt"></i> S'inscrire</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const menuIcon = document.getElementById("menu-icon");
+        const nav = document.querySelector("nav ul");
+    
+        menuIcon.addEventListener("click", function () {
+            nav.classList.toggle("active");
+        });
+    });
+    
+    </script>
+        
+<main style="margin-top: 125px;">
+    <h1 style="width: 100%; color: var(--color-blue); text-align: center; font-family: cursive; color: black; font-weight: bold; text-decoration: underline;">Nos Articles</h1>
+    <div class="container">
+        <!-- Product Grid -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+    <div class="product-grid" >
+        {% for product in products %}
+        <div class="product-card">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="price client-price">Prix Client: {{ product.final_commercial_price }} FCFA</p>
+                <a href="{% url 'aibh:ajouter_au_panier' product.id %}" class="add-to-cart">Ajouter au panier</a>
+                <div class="actions">
+                    <span class="like"><i class="fa fa-heart"></i></span>
+                </div>
+                {% if user.profile.is_affilie %}
+                <a href="{% url 'aibh:generate_affiliate_link' product.id %}" class="btn btn-primary add-to-cart">Générer un lien d'affiliation</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="product-card">
+            <p>Aucun produit étranger disponible</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+    
+    </div>
+
+</main>
+<footer>
+    <div class="footer-container">
+        <div class="footer-section logo-section">
+            <img src="{% static 'logo.png'%}" alt="Logo AIBH Market" class="footer-logo">
+        </div>
+        <div class="footer-section contact-section">
+            <h3>Contact</h3>
+            <p>Pour nous joindre : WhatsApp +226 67207272, +226 60705634</p>
+            <p>OUAGADOUGOU, BURKINA FASO</p>
+        </div>
+        <div class="footer-section social-media-section">
+            <h3>Suivez-nous</h3>
+            <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <div class="footer-section thanks-section">
+            <p>&copy; 2024 AIBH Market. Tous droits réservés.</p>
+        </div>
+    </div>
+</footer>
+
+    <script src="{% static 'main.js'%}"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>

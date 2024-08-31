@@ -1,0 +1,44 @@
+
+{% block content %}
+  <div class="product-detail">
+    <h1>{{ product.name }}</h1>
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Price:</strong> {{ product.price_commercial }}</p>
+    
+    {% if request.GET.aff_id %}
+      <p><strong>Note:</strong> Vous consultez ce produit via un lien d'affiliation. Si vous achetez ce produit, une commission sera versée à l'affilié.</p>
+    {% endif %}
+    
+    <form action="{% url 'aibh:ajouter_au_panier' product.id %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="affiliate_link" value="{{ request.GET.aff_id }}">
+      <button type="submit" class="btn btn-primary">Ajouter au panier</button>
+    </form>
+  </div>
+
+  <style>
+    .product-detail {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .product-image {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+  </style>
+{% endblock %}

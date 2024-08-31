@@ -1,0 +1,484 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte Utilisateur</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <script src="https://cdn.cinetpay.com/seamless/main.js" type="text/javascript"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <a href="{% url 'aibh:index' %}">
+                <img src="{% static 'logo.png' %}" alt="AIBH Market Logo" class="logo">
+            </a>
+        </div>
+        <div class="menu-icon" id="menu-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav id="navbar">
+            <ul>
+                <li><a href="{% url 'aibh:index' %}"><i class="fa fa-home"></i> Accueil</a></li>
+                <li><a href="{% url 'aibh:bienetre' %}"><i class="fa fa-leaf"></i> Espace Bien-être</a></li>
+                <li><a href="{% url 'aibh:boutique' %}"><i class="fa fa-shopping-cart"></i> Market place</a></li>
+                <li><a href="{% url 'aibh:logout' %}"><i class="fa fa-sign-out-alt"></i> Se Deconnecter</a></li>
+            </ul>
+        </nav>
+    </header>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const menuIcon = document.getElementById("menu-icon");
+        const nav = document.querySelector("nav ul");
+    
+        menuIcon.addEventListener("click", function () {
+            nav.classList.toggle("active");
+        });
+    });
+    
+    </script>
+
+    <!-- Main Content -->
+    <main>
+        <div class="account-container">
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <div class="profile-picture">
+                    {% if profile.photo and profile.photo.url %}
+                        <img src="{{ profile.photo.url }}" alt="Photo de Profil">
+                    {% else %}
+                        <img src="{% static 'ico.png' %}" alt="Photo de Profil">
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <h2>{{ profile.nom }} {{ profile.prenom }}</h2>
+                    <p>Inscrit depuis le : {{ profile.user.date_joined|date:"d/m/Y" }}</p>
+                    <span class="community-status">
+                        {% if profile.is_membre %}
+                            Membre de AIBH
+                        {% elif profile.is_affilie %}
+                            Affilié de AIBH
+                        {% else %}
+                            Statut : Non membre/affilié
+                        {% endif %}
+                    </span>
+                    <div class="toggle-affiliation">
+                        <span id="toggle-affiliation-btn">
+                            {% if profile.is_affilie %}
+                                <button class="community-status" style="border: none; margin: 10px;">Se désinscrire</button>
+                            {% else %}
+                                <button class="community-status" style="border: none; margin: 10px;">S'inscrire</button>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Section -->
+            <div class="wallet-section">
+                <div class="wallet-box">
+                    <i class="fas fa-wallet wallet-icon"></i>
+                    <div class="wallet-details">
+                        <div class="wallet-balance">
+                            <span>Solde:</span>
+                            <strong>0,00 FCFA <span style="font-weight: bold; color: red;">(En Production)</span></strong> <!-- Cette valeur devrait être dynamique -->
+                        </div>
+                    </div>
+                    <div class="wallet-actions">
+                        <button class="withdraw-button">Retirer <span style="font-weight: bold; color: red;">(indisponible)</span></button>
+                    </div>
+                </div>
+            </div>
+            {% if user.profile.is_affilie %}
+            <h2 style="width: 100%; margin: 20px;">Mes liens d'affiliation</h2>
+            <ul>
+                {% for link in affiliate_links %}
+                    <li>
+                        <strong>{{ link.product.name }}</strong> - 
+                        <a href="{{ link.get_affiliate_url }}" target="_blank">{{ link.get_affiliate_url }}</a>
+                        <span> | Commission: {{ link.commission|floatformat:2 }} FCFA</span>
+                    </li>
+                {% endfor %}
+            </ul>
+                {% else %}
+                    <p>Vous n'êtes pas affilié.</p>
+                {% endif %}
+        </div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.getElementById('toggle-affiliation-btn');
+    
+            btn.addEventListener('click', function() {
+                if (confirm("Êtes-vous sûr de vouloir vous inscrire en tant qu'affilié ? Le montant du paiement est de 5000 XOF.")) {
+                    // Démarrer le paiement avant de changer le statut d'affiliation
+                    startPaymentProcess();
+                }
+            });
+    
+            function startPaymentProcess() {
+                const transactionId = Math.floor(Math.random() * 100000000).toString();
+                const amount = 5000; // Montant fixe pour l'inscription
+    
+                CinetPay.setConfig({
+                    apikey: '137070531466cf46e7ed7786.71394830',
+                    site_id: 5878821,
+                    notify_url: 'http://localhost:8000/panier/',
+                    mode: 'PRODUCTION'
+                });
+    
+                CinetPay.getCheckout({
+                    transaction_id: transactionId,
+                    amount: amount,
+                    currency: 'XOF',
+                    channels: 'ALL',
+                    description: 'Paiement pour l\'inscription en tant qu\'affilié',
+                    customer_name: "Nom Défaut",  // Nom par défaut
+                    customer_surname: "Prénom Défaut",  // Prénom par défaut
+                    customer_email: "email@exemple.com",  // Email par défaut
+                    customer_phone_number: "0000000000",  // Numéro de téléphone par défaut
+                    customer_address: "Adresse par défaut",  // Adresse par défaut
+                    customer_city: "Ville par défaut",  // Ville par défaut
+                    customer_country: "CM",  // Code ISO du pays par défaut
+                    customer_state: "",  // Code ISO de l'état par défaut
+                    customer_zip_code: ""  // Code postal par défaut
+                });
+    
+                CinetPay.waitResponse(function(data) {
+                    if (data.status === "REFUSED") {
+                        alert("Votre paiement a échoué.");
+                        window.location.reload();
+                    } else if (data.status === "ACCEPTED") {
+                        alert("Votre paiement a été effectué avec succès.");
+                        changeAffiliationStatus();
+                    }
+                });
+    
+                CinetPay.onError(function(data) {
+                    console.log(data);
+                });
+            }
+    
+            function changeAffiliationStatus() {
+                fetch("{% url 'aibh:toggle_affiliation' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Met à jour l'affichage du bouton en fonction de l'état d'affiliation
+                        btn.innerHTML = data.is_affilie ? "<span>Se désinscrire</span>" : "<span>S'inscrire</span>";
+                    } else {
+                        alert("Une erreur est survenue. Veuillez réessayer.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+    
+            // Fonction pour obtenir le CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+    
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section logo-section">
+                <img src="{% static 'logo.png' %}" alt="Logo AIBH Market" class="footer-logo">
+            </div>
+            <div class="footer-section contact-section">
+                <h3>Contact</h3>
+                <p>Pour nous joindre : WhatsApp +226 67207272, +226 60705634</p>
+                <p>OUAGADOUGOU, BURKINA FASO</p>
+            </div>
+            <div class="footer-section social-media-section">
+                <h3>Suivez-nous</h3>
+                <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="footer-section thanks-section">
+                <p>&copy; 2024 AIBH Market. Tous droits réservés.</p>
+            </div>
+        </div>
+        <!-- Dans votre template HTML -->
+
+    </footer>
+    <style>
+        /* Variables de Couleurs */
+:root {
+    --color-primary: #02e9cd;
+    --color-secondary: #008000;
+    --color-accent: #005f5f;
+    --color-white: #FFFFFF;
+    --color-black: #000000;
+    --color-grey: #f0f0f0;
+    --color-dark-grey: #333333;
+    --font-family: 'Roboto', sans-serif;
+}
+
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-grey);
+    color: var(--color-dark-grey);
+    line-height: 1.6;
+}
+
+
+/* Main Content */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+}
+
+.account-container {
+    background-color: var(--color-white);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px;
+    padding: 40px;
+    margin-top: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+}
+
+/* Profile Section */
+.profile-section {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--color-primary);
+    margin-bottom: 20px;
+}
+
+.user-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--color-dark-grey);
+}
+
+.user-info p {
+    font-size: 1rem;
+    color: var(--color-grey-dark);
+    margin-bottom: 15px;
+}
+
+.community-status {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Wallet Section */
+.wallet-section {
+    flex: 1 1 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wallet-box {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.wallet-box::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.05);
+    top: -50%;
+    left: -50%;
+    transform: rotate(45deg);
+}
+
+.wallet-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.wallet-details {
+    margin-bottom: 30px;
+}
+
+.wallet-details div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.wallet-actions button {
+    background-color: var(--color-secondary);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    color: var(--color-white);
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.wallet-actions button:hover {
+    background-color: var(--color-accent);
+}
+
+
+@media (max-width: 900px) {
+
+nav ul li a {
+    font-size: 14px;
+    color: var(--color-white);
+}
+
+nav ul li a i{
+    font-size: 14px;
+    color: var(--color-white);
+}
+}
+
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+
+    main {
+        padding: 30px 10px;
+    }
+
+    .account-container {
+        padding: 30px 20px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wallet-section {
+        margin-top: 30px;
+    }
+
+    .menu-icon {
+    display: block;
+    right: 10%;
+    position: absolute;
+}
+
+.product-card {
+    width: 100%;
+}
+
+nav ul {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-blue);
+    position: fixed;
+    top: 60px; /* Adjust according to header height */
+    right: 0;
+    left: 0;
+    margin: 0;
+    padding: 10px 0;
+}
+
+nav ul.active {
+    display: flex;
+}
+
+nav ul li {
+    margin: 15px 0;
+    padding-right: 0;
+}
+
+nav ul li a {
+    font-size: 18px;
+    color: var(--color-white);
+}
+}
+
+@media (max-width: 480px) {
+    .wallet-box {
+        padding: 30px 20px;
+    }
+
+    .wallet-details div {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wallet-details div span {
+        margin-bottom: 5px;
+    }
+
+    .wallet-actions button {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+    </style>
+
+</body>
+</html>

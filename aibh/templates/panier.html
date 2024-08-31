@@ -1,0 +1,99 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre Panier</title>
+    <link rel="stylesheet" href="{% static 'panier.css' %}">
+    <script src="https://cdn.cinetpay.com/seamless/main.js" type="text/javascript"></script>
+    <script>
+        function checkout(itemId) {
+    CinetPay.setConfig({
+        apikey: '137070531466cf46e7ed7786.71394830',
+        site_id: 5878821,
+        notify_url: 'http://localhost:8000/panier/',
+        mode: 'PRODUCTION'
+    });
+
+    const transactionId = Math.floor(Math.random() * 100000000).toString();
+    document.getElementById(`transaction_id_${itemId}`).value = transactionId;
+
+    CinetPay.getCheckout({
+        transaction_id: transactionId,
+        amount: parseFloat(document.querySelector(`#paymentForm_${itemId} input[name="total_amount"]`).value),
+        currency: 'XOF',
+        channels: 'ALL',
+        description: 'Paiement du panier',
+        customer_name: "{{ customer_name|escapejs }}",  // Nom du client
+        customer_surname: "{{ customer_surname|escapejs }}",  // Prénom du client
+        customer_email: "{{ customer_email|escapejs }}",  // Email du client
+        customer_phone_number: "{{ customer_phone_number|escapejs }}",  // Numéro de téléphone
+        customer_address: "BP 0024",  // Adresse par défaut
+        customer_city: "Antananarivo",  // Ville par défaut
+        customer_country: "CM",  // Code ISO du pays
+        customer_state: "CM",  // Code ISO de l'état
+        customer_zip_code: "06510",  // Code postal
+    });
+
+    CinetPay.waitResponse(function(data) {
+        const paymentStatusField = document.getElementById(`payment_status_${itemId}`);
+        const successCheckbox = document.getElementById(`payment_success_${itemId}`);
+
+        if (data.status === "REFUSED") {
+            alert("Votre paiement a échoué");
+            window.location.reload();
+        } else if (data.status === "ACCEPTED") {
+            alert("Votre paiement a été effectué avec succès");
+            paymentStatusField.value = "PAID";
+            successCheckbox.checked = true;
+            document.getElementById(`paymentForm_${itemId}`).submit();  // Soumet le formulaire
+        }
+    });
+
+    CinetPay.onError(function(data) {
+        console.log(data);
+    });
+}
+
+    </script>
+</head>
+<body>
+    <section class="cart-section">
+        <h2>Votre Panier</h2>
+        {% for item in panier_items %}
+            <form id="paymentForm_{{ item.id }}" method="POST" action="{% url 'aibh:enregistrer_achat' %}">
+                {% csrf_token %}
+                <input type="hidden" name="transaction_id" id="transaction_id_{{ item.id }}">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <input type="hidden" name="total_amount" value="{{ total }}">
+                <input type="hidden" name="payment_status" id="payment_status_{{ item.id }}" value="PENDING">
+
+                <li class="cart-item">
+                    {{ item.quantity }} x {{ item.product.name }} - {{ item.total_price }} FCFA
+                </li>
+                
+                <input type="checkbox" id="payment_success_{{ item.id }}" name="payment_success" disabled>
+                <button class="pay-button" type="button" onclick="checkout('{{ item.id }}')">Payer</button>
+            </form>
+        {% endfor %}
+
+
+        <!-- Bouton pour vider le panier -->
+        <form method="POST" action="{% url 'aibh:vider_panier' %}">
+            {% csrf_token %}
+            <button type="submit"  class="empty-cart-button pay-button" style="background-color: white; color: green;">Vider le panier</button>
+        </form>
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+</body>
+
+</html>

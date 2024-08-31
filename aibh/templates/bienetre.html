@@ -1,0 +1,414 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Bien-être Sanitaire et Hygiénique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Variables */
+        :root {
+            --color-blue: #02e9cd;
+            --color-white: #FFFFFF;
+            --color-black: #000000;
+            --color-green: #008000;
+            --color-red: #FF0000;
+            --color-last: #21D7EF;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-white);
+            color: var(--color-black);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: var(--color-blue);
+            color: var(--color-white);
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .logo-container img {
+            max-width: 150px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: var(--color-white);
+            text-decoration: none;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: 80px auto 20px; /* Margin-top adjusted for header */
+            gap: 20px;
+        }
+
+        .sidebox {
+            position: absolute;
+            right: 1%;
+            width: 21%;
+            flex: 1;
+            background-color: var(--color-blue);
+            color: var(--color-white);
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 80px; /* Adjusted for header height */
+        }
+
+        .sidebox h3 {
+            margin-top: 0;
+        }
+
+        .sidebox ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebox ul li {
+            cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid var(--color-white);
+        }
+
+        .sidebox ul li:hover {
+            background-color: var(--color-green);
+        }
+
+        .main-content {
+            flex: 3;
+        }
+
+        #banner {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #banner video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #banner h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--color-white);
+            font-size: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #articles, #recommended-products, #testimonials {
+            margin-bottom: 20px;
+        }
+
+        .articles-container, .products-container, .testimonials-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .article, .product, .testimonial {
+            background-color: var(--color-green);
+            border-radius: 5px;
+            overflow: hidden;
+            flex: 1 1 calc(33% - 20px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .article img, .product img, .testimonial img {
+            width: 100%;
+            height: auto;
+        }
+
+        .product {
+            flex: 1 1 calc(25% - 20px); /* Adjusted for smaller images */
+        }
+
+        .testimonial img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: var(--color-blue);
+            color: var(--color-white);
+            width: 100%;
+        }
+
+        .footer-section {
+            flex: 1;
+        }
+
+        .social-icon {
+            color: var(--color-white);
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebox, .main-content {
+                flex: none;
+                width: 100%;
+            }
+
+            .article, .product, .testimonial {
+                flex: 1 1 100%;
+            }
+
+            #banner h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+
+        /* Style pour le <select> */
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    appearance: none; /* Enlève l'apparence par défaut pour customiser */
+    -webkit-appearance: none; /* Enlève l'apparence par défaut dans Safari */
+    -moz-appearance: none; /* Enlève l'apparence par défaut dans Firefox */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+}
+
+select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Style pour les <option> */
+option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Option lorsque survolée (hover) */
+option:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Option sélectionnée */
+option:checked {
+    background-color: #007bff;
+    color: #fff;
+}
+    
+    </style>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+
+
+    <header>
+        <div class="logo-container">
+            <img src="{% static 'logo.png' %}" alt="AIBH Market Logo">
+        </div>
+        <div class="menu-icon" id="menu-icon" style="margin-right: 25px;">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+            <ul>
+                <li class="dropdown">
+                    <a href="{% url 'aibh:index' %}"><i class="fa fa-home"></i> Accueil</a>
+                </li>
+                <li class="dropdown">
+                    <a href="{% url 'aibh:bienetre' %}"><i class="fa fa-leaf"></i> Espace Bien-être</a>
+                </li>
+                <li class="dropdown">
+                    <a href="{% url 'aibh:boutique' %}"><i class="fa fa-shopping-cart"></i> Market place</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'aibh:local_products' %}"><i class="fa fa-cube"></i> Produits Locaux</a></li>
+                        <li><a href="{% url 'aibh:foreign_products' %}"><i class="fa fa-globe"></i> Produits Étrangers</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="{% url 'aibh:user_profile_view' %}"><i class="fa fa-user"></i> Compte</a>
+                    <ul class="dropdown-menu decal">
+                        <li><a href="{% url 'aibh:signin' %}"><i class="fa fa-user-plus"></i>Se Connecter</a></li>
+                        <li><a href="{% url 'aibh:signup' %}"><i class="fa fa-sign-in-alt"></i> S'inscrire</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const menuIcon = document.getElementById("menu-icon");
+        const nav = document.querySelector("nav ul");
+    
+        menuIcon.addEventListener("click", function () {
+            nav.classList.toggle("active");
+        });
+    });
+    
+    </script>
+
+    <div class="container" style="margin: 100px;">
+        <!-- Sidebox -->
+         <!--<aside class="sidebox">
+            <h3>Types de Conseils</h3>
+            <ul>
+                <li data-category="hygiene-personnelle">Hygiène personnelle</li>
+                <li data-category="nutrition">Nutrition</li>
+                <li data-category="sante-mentale">Santé mentale</li>
+            </ul>
+        </aside> -->
+
+        <form class="sidebox" method="get" action="{% url 'aibh:bienetre' %}" style="margin-top: 15px;">
+            <h3>Vos filtres</h3>
+            <label for="category">Choisir une catégorie :</label>
+            <select name="category_id" id="category" onchange="this.form.submit();">
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category and selected_category.id == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Bannière d'accueil -->
+            <section id="banner">
+                <video autoplay muted loop>
+                    <source src="{%static 'video.mp4'%}" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+                <h1>Bienvenue dans votre espace de bien-être</h1>
+            </section>
+
+            <!-- Section des articles -->
+            <section id="articles">
+                <h2>Articles sur le Bien-être</h2>
+                <div class="articles-container">
+                    {% for blog in blogs %}
+                    <div class="article" data-category="hygiene-personnelle">
+                        <img src="{{ blog.image.url }}" alt="{{ blog.title }}">
+                        <h3>{{ blog.title }}</h3>
+                        <p>{{ blog.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Section des produits recommandés -->
+            <section id="recommended-products">
+                <h2>Produits Recommandés</h2>
+                <div class="products-container">
+                    {% for product in products %}
+                    <div class="product">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        <h3>{{ product.name }}</h3>
+                        <p>Prix commercial : {{ product.price_commercial }} | Prix partenaire : {{ product.price_partner }}</p>
+                        <p>{{ product.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Section des témoignages -->
+            <!-- Avis des clients -->
+            <div class="reviews-section" style="margin-left: 25px;">
+                <a style="text-decoration: none; font-size: 20px; font-weight: bold;" href="{% url 'aibh:soumettre_avis' %}">Donner votre avis</a>
+                <h2 style="width: 100%; text-align: center;">Retour clients</h2>
+                {% for avis in avis_autorises %}
+                <div class="review">
+                    <img src="{{ avis.profile.photo.url }}" alt="Client {{ forloop.counter }}">
+                    <p>"{{ avis.message }}"</p>
+                    <h3>{{ avis.profile.nom }} {{ avis.profile.prenom }}</h3>
+                </div>
+                {% empty %}
+                <p>Aucun avis disponible.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section logo-section">
+                <img src="{% static 'logo.png' %}" alt="Logo AIBH Market" class="footer-logo">
+            </div>
+            <div class="footer-section contact-section">
+                <h3>Contact</h3>
+                <p>Pour nous joindre : WhatsApp +226 67207272, +226 60705634</p>
+                <p>OUAGADOUGOU, BURKINA FASO</p>
+            </div>
+            <div class="footer-section social-media-section">
+                <h3>Suivez-nous</h3>
+                <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="footer-section thanks-section">
+                <p>&copy; 2024 AIBH Market. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

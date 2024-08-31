@@ -1,0 +1,179 @@
+
+<form id="product-form">
+    <div class="form-group">
+      <label>Type de produit</label><br>
+      <input type="radio" id="local" name="product_type" value="local" checked>
+      <label for="local">Local</label><br>
+      <input type="radio" id="etranger" name="product_type" value="etranger">
+      <label for="etranger">Étranger</label>
+    </div>
+  
+    <div class="form-group" id="country-group" style="display: none;">
+      <label for="country">Pays</label>
+      <select id="country" name="country">
+        <option value="">Sélectionnez un pays</option>
+        <option value="france">France</option>
+        <option value="belgium">Belgique</option>
+        <option value="canada">Canada</option>
+        <option value="germany">Allemagne</option>
+      </select>
+    </div>
+  
+    <button type="submit">Envoyer</button>
+  </form>
+
+  
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const localRadio = document.getElementById("local");
+    const etrangerRadio = document.getElementById("etranger");
+    const countryGroup = document.getElementById("country-group");
+
+    function toggleCountrySelector() {
+        if (etrangerRadio.checked) {
+            countryGroup.style.display = "block";
+        } else {
+            countryGroup.style.display = "none";
+        }
+    }
+
+    // Initial check on page load
+    toggleCountrySelector();
+
+    // Add event listeners to radios
+    localRadio.addEventListener("change", toggleCountrySelector);
+    etrangerRadio.addEventListener("change", toggleCountrySelector);
+});
+
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+  :root {
+--color-blue: #014101;
+--color-white: #FFFFFF;
+--color-black: #000000;
+--color-green: #63c5ba;
+--color-red: #FF0000;
+--color-last: #21D7EF;
+--color-orange: #fc6704;
+}
+
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+padding: 0;
+background-color: var(--color-white);
+color: var(--color-black);
+}
+
+.cart-section {
+max-width: 800px;
+margin: 20px auto;
+padding: 20px;
+background-color: var(--color-blue);
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+margin-bottom: 20px;
+color: var(--color-white);
+font-size: 24px;
+text-align: center;
+}
+
+.cart-items {
+list-style: none;
+padding: 0;
+margin: 0;
+}
+
+.cart-item {
+padding: 10px 0;
+border-bottom: 1px solid var(--color-white);
+color: var(--color-white);
+font-size: 18px;
+}
+
+.cart-item:last-child {
+border-bottom: none;
+}
+
+.cart-total {
+margin-top: 20px;
+font-size: 20px;
+font-weight: bold;
+color: var(--color-last);
+text-align: center;
+}
+
+.pay-button {
+display: block;
+width: 100%;
+max-width: 200px;
+margin: 30px auto 0;
+padding: 10px;
+text-align: center;
+color: var(--color-white);
+background-color: var(--color-orange);
+border: none;
+border-radius: 5px;
+text-decoration: none;
+font-size: 18px;
+font-weight: bold;
+transition: background-color 0.3s ease;
+}
+
+.pay-button:hover {
+background-color: var(--color-red);
+}
+
+.payment-status {
+font-size: 14px;
+font-weight: bold;
+color: var(--color-orange);
+margin-top: 25px;
+}
+
+
+</style>

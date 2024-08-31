@@ -1,0 +1,16 @@
+{% block content %}
+    <h2>Générer un lien d'affiliation</h2>
+    <p>Produit: {{ affiliate_link.product.name }}</p>
+    <p>Votre lien d'affiliation :</p>
+    <input type="text" value="{{ request.build_absolute_uri(affiliate_link.get_affiliate_url) }}" readonly>
+    <button onclick="copyToClipboard()">Copier</button>
+
+    <script>
+        function copyToClipboard() {
+            const copyText = document.querySelector("input");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Lien d'affiliation copié!");
+        }
+    </script>
+{% endblock %}

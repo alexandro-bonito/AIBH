@@ -1,0 +1,422 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'accueil - AIBH Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        /* Variables */
+        :root {
+            --color-blue:#014101;
+            --color-white: #FFFFFF;
+            --color-black: #000000;
+            --color-green:  #63c5ba;
+            --color-red: #FF0000;
+            --color-last: #21D7EF;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-white);
+            color: var(--color-black);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .banner {
+    height: 450px;
+    background-image: url('{% static 'banner5.jpeg' %}');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Assurez-vous que le flou ne dépasse pas */
+    width: 100%; /* Prend toute la largeur de l'écran */
+    max-width: 100%; 
+    padding: 20px 0; /* Espacement vertical */
+    box-sizing: border-box; 
+}
+
+.banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5); /* Couleur blanche avec opacité pour créer l'effet blanchâtre */
+    backdrop-filter: blur(5px); /* Applique le flou */
+    z-index: 1; /* Assurez-vous que le flou reste derrière le contenu de la bannière */
+}
+
+.banner > * {
+    position: relative;
+    z-index: 2; /* Pour que le contenu reste au-dessus de l'effet de flou */
+    
+}
+
+
+        .banner h1 {
+            color: var(--color-white);
+            font-size: 3rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .product-slider,
+        .reviews-section,
+        .contact-form {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-slider {
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-track {
+            display: flex;
+            animation: scroll 15s linear infinite;
+        }
+
+        .product {
+            min-width: 200px;
+            margin-right: 20px;
+            text-align: center;
+        }
+
+        .product img {
+            width: 100%;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .product:hover img {
+            transform: scale(1.1);
+        }
+
+        .product h2 {
+            font-size: 1.2rem;
+            color: var(--color-black);
+            margin: 10px 0;
+        }
+
+        .product p {
+            font-size: 1rem;
+            color: var(--color-green);
+        }
+
+        .reviews-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .review {
+            width: 250px;
+            margin: 10px;
+            text-align: center;
+            border: 1px  solid rgb(230, 225, 225);
+            border-radius: 15px;
+        }
+
+        .review img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .review p {
+            font-size: 1rem;
+            color: var(--color-green);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--color-blue);
+
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid var(--color-blue);
+            border-radius: 5px;
+        }
+
+        .contact-form button {
+            padding: 10px 20px;
+            background-color: var(--color-green);
+            color: var(--color-white);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact-form button:hover {
+            background-color: var(--color-red);
+        }
+
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: black;    padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+}
+
+.company-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.company-text h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.company-text p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.company-text button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: var(--color-white);
+    background-color: var(--color-green);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.company-text button:hover {
+    background-color: var(--color-last);
+}
+
+.company-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.company-image img {
+    max-width: 100%;
+    height: 300px;
+}
+
+    </style>
+
+</head>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const menuIcon = document.getElementById("menu-icon");
+    const nav = document.querySelector("nav ul");
+
+    menuIcon.addEventListener("click", function () {
+        nav.classList.toggle("active");
+    });
+});
+
+</script>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="{% static 'logo.png' %}" alt="AIBH Market Logo" id="hidden-link-activation">
+            <a href="{% url 'aibh:admin_panelle' %}" style="display: none;" id="hidden-link"></a>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const logo = document.getElementById('hidden-link-activation');
+                const hiddenLink = document.getElementById('hidden-link');
+        
+                let clickCount = 0;
+                let lastClickTime = 0;
+        
+                // Assurez-vous que le lien reste caché initialement
+                hiddenLink.style.display = 'none';
+        
+                logo.addEventListener('click', function() {
+                    const currentTime = new Date().getTime();
+                    const timeDiff = (currentTime - lastClickTime) / 1000; // Temps écoulé en secondes
+        
+                    if (timeDiff > 1) {
+                        // Réinitialiser le compteur si le délai entre les clics est supérieur à 1 seconde
+                        clickCount = 0;
+                    }
+        
+                    lastClickTime = currentTime;
+                    clickCount += 1;
+        
+                    if (clickCount >= 4) {
+                        // Activer le lien et rediriger l'utilisateur
+                        hiddenLink.style.display = 'inline'; // Ne l'affiche que lorsqu'on clique 4 fois
+                        window.location.href = hiddenLink.href;  // Redirige vers le lien
+                        clickCount = 0;  // Réinitialiser le compteur de clics
+                    }
+                });
+            });
+        </script>
+                
+        <div class="menu-icon" id="menu-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+            <ul>
+                <!-- Accueil -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:index' %}"><i class="fa fa-home"></i> Accueil</a>
+                </li>
+                
+                <!-- Espace Bien-être -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:bienetre' %}"><i class="fa fa-leaf"></i> Espace Bien-être</a>
+                </li>
+                
+                <!-- Market place -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:boutique' %}"><i class="fa fa-shopping-cart"></i> Market place</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'aibh:local_products' %}"><i class="fa fa-cube"></i> Produits Locaux</a></li>
+                        <li><a href="{% url 'aibh:foreign_products' %}"><i class="fa fa-globe"></i> Produits Étrangers</a></li>
+                    </ul>
+                </li>
+
+                <!-- Compte -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:user_profile_view' %}"><i class="fa fa-user"></i> Compte</a>
+                    <ul class="dropdown-menu decal">
+                        <li><a href="{% url 'aibh:signin' %}"><i class="fa fa-user-plus"></i>Se Connecter</a></li>
+                        <li><a href="{% url 'aibh:signup' %}"><i class="fa fa-sign-in-alt"></i> S'inscrire</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+
+    <!-- Bannière -->
+    <div class="banner">
+        <h1>AIBH</h1>
+    </div>
+
+
+    <div class="company-info">
+        <div class="company-text">
+            <h2>À Propos de Nous</h2>
+            <p>AIBH Market est votre destination pour les produits biomédicaux, les conseils en santé et les matériels de qualité. Nous nous engageons à offrir les meilleurs services pour améliorer la santé de notre communauté.</p>
+            <a style="background-color: green; width: 150px; font-size: 20px; font-weight: bold; border-radius: 5px; height: 45px; text-decoration: none; color: wheat;" href="{% url 'aibh:signup' %}">Rejoindre la Communauté</a>
+        </div>
+        <div class="company-image">
+            <img src="{% static 'banner2.jpeg' %}" style="border: none;" alt="AIBH Market">
+        </div>
+    </div>
+
+<!-- Aperçu des produits -->
+
+    <div class="product-slider">
+        {% for product in products %}
+        <div class="product" >
+            <div class="product-item">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                <h2>{{ product.name }}</h2>
+                <p style="color: black;">
+                    {{ product.price_partner }}-<span style="color: orangered; font-size: 10px;">FCFA</span>
+                    <span style="color:gold;">(partenaire)</span>
+                </p>
+                <p style="color: black;">
+                    {{ product.price_commercial }}-<span style="color: orangered; font-size: 10px;">FCFA</span>
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    
+ </div>
+
+
+<!-- Avis des clients -->
+<div class="reviews-section">
+    <a style="text-decoration: none; font-size: 20px; font-weight: bold;"  href="{% url 'aibh:soumettre_avis' %}">Donner votre avis</a>
+    <h2 style="width: 100%; text-align: center;">Retour clients</h2>
+    {% for avis in avis_autorises %}
+    <div class="review">
+        <img src="{{ avis.profile.photo.url }}" alt="Client {{ forloop.counter }}">
+        <p>"{{ avis.message }}"</p>
+        <h3>{{ avis.profile.nom }} {{ avis.profile.prenom }}</h3>
+    </div>
+    {% empty %}
+    <p>Aucun avis disponible.</p>
+    {% endfor %}
+</div>
+
+
+    <!-- Formulaire de contact -->
+    <div class="contact-form">
+        <h2>Contactez-nous</h2>
+        <form method="POST" action="{% url 'aibh:contact' %}">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Nom" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <textarea rows="5" name="message" placeholder="Votre message" required></textarea>
+            <button style="width: 70%;" type="submit">Envoyer</button>
+        </form>
+    </div>
+    
+    
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section logo-section">
+                <img src="{% static 'logo.png' %}" alt="Logo AIBH Market" class="footer-logo">
+            </div>
+            <div class="footer-section contact-section">
+                <h3>Contact</h3>
+                <p>Pour nous joindre : WhatsApp +226 67207272, +226 60705634</p>
+                <p>OUAGADOUGOU, BURKINA FASO</p>
+            </div>
+            <div class="footer-section social-media-section">
+                <h3>Suivez-nous</h3>
+                <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="footer-section thanks-section">
+                <p>&copy; 2024 AIBH Market. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+<script src="{% static 'main.js' %}"></script>
+</html>

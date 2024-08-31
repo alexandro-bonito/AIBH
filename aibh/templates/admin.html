@@ -1,0 +1,537 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panneau d'administration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        /* Style pour les modals */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
+        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="{% static 'logo.png' %}" alt="AIBH Market Logo">
+        </div>
+        <div class="menu-icon" id="menu-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+            <ul>
+                <!-- Accueil -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:index' %}"><i class="fa fa-home"></i> Accueil</a>
+                </li>
+                
+                <!-- Espace Bien-être -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:bienetre' %}"><i class="fa fa-leaf"></i> Espace Bien-être</a>
+                </li>
+                
+                <!-- Market place -->
+                <li class="dropdown">
+                    <a href="{% url 'aibh:boutique' %}"><i class="fa fa-shopping-cart"></i> Market place</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#produits-locaux"><i class="fa fa-cube"></i> Produits Locaux</a></li>
+                        <li><a href="#produits-etrangers"><i class="fa fa-globe"></i> Produits Étrangers</a></li>
+                        <li><a href="#services"><i class="fa fa-concierge-bell"></i> Services</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+<div id="error-message" class="error-message">
+    <p>Utiliser un ordinateur ou une tablette pour gérer l'administration</p>
+</div>
+
+<div class="admin-panel" style="margin: 150px;">
+    <div class="header">
+        <h1>Panneau d'administration</h1>
+    </div>
+
+    <section class="quick-actions" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+        <div class="card" id="add-blog">
+            <i class="fas fa-pencil-alt"></i>
+            <h2>Ajouter Un Article de blog</h2>
+        </div>
+        <div class="card" id="add-product">
+            <i class="fas fa-box-open"></i>
+            <h2>Ajouter Un Produit</h2>
+        </div>
+
+        <!-- Bouton pour ouvrir le formulaire d'ajout de catégorie -->
+        <div class="card">
+            <i class="fas fa-folder"></i>
+            <button id="open-category-form">Ajouter une Catégorie</button>
+        </div>
+    </section>
+
+    <section class="content">
+        <h2>Articles De Blog</h2>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Catégorie</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="blog-list">
+                {% with blogs|dictsort:"-created_at" as sorted_blogs %}
+                {% for blog in blogs %}
+                <tr>
+                    <td>{{ blog.title }}</td>
+                    <td>{{ blog.category.name }}-<span style="color: orangered; font-size: 10px;">FCFA</span></td>
+                    <td>{{ blog.description }}-<span style="color: orangered; font-size: 10px;">FCFA</span></td>
+                    <td>{{ product.created_at }}</td>
+                    <td>
+                        <a href="{% url 'aibh:delete_blog' blog.id %}" class="delete-button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article de blog ?');"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Aucun article de blog disponible</td>
+                </tr>
+                {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+        
+        <h2>Produits</h2>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Description</th>
+                    <th>Prix (Commercial)</th>
+                    <th>Prix (Partenaire)</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-list">
+                {% with products|dictsort:"-created_at" as sorted_products %}
+                {% for product in products%}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.price_commercial }}- <span style="color: orangered; font-size: 10px;">FCFA</span></td>
+                    <td>{{ product.price_partner }}-<span style="color: orangered; font-size: 10px;">FCFA</span></td>
+                    <td>{{ product.created_at }}</td>
+                    <td>
+                        <a href="{% url 'aibh:delete_product' product.id %}" class="delete-button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">Aucun produit disponible</td>
+                </tr>
+                {% endfor %}
+                {%endwith%}
+            </tbody>
+        </table>
+        
+
+        <h2>Commandes et Ventes</h2>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>ID De Commande</th>
+                    <th>Produit</th>
+                    <th>Client</th>
+                    <th>Moyen de Paiement</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for achat in achats %}
+                <tr>
+                    <td>{{ achat.transaction_id }}</td>
+                    <td>{{ achat.panier.products.first.name }}</td>
+                    <td>{{ achat.profile.nom }} {{ achat.profile.prenom }}</td>
+                    <td>{{ achat.payment_method }}</td>
+                    <td>{{ achat.payment_status }}</td>
+                    <td>{{ achat.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Aucun achat trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h2>Avis</h2>
+        <form method="POST" action="{% url 'aibh:admin_panelle' %}">
+            {% csrf_token %}
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Profil</th>
+                        <th>Message</th>
+                        <th>Autorisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for avis in avis_clients %}
+                    <tr>
+                        <td>{{ avis.profile.nom }} {{ avis.profile.prenom }}</td>
+                        <td>{{ avis.message }}</td>
+                        <td>
+                            <input type="checkbox" name="avis_{{ avis.id }}" {% if avis.autorise %}checked{% endif %}>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Aucun avis disponible</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" name="update_avis">Mettre à jour les avis</button>
+        </form>
+        
+    </section>
+</div>
+
+<!-- Modal for adding/editing blogs and products -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <div id="modal-form-content">
+            <!-- Le contenu du formulaire sera injecté ici dynamiquement -->
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Forms -->
+<div id="hidden-forms" style="display: none;">
+    <div id="blog-form">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'aibh:admin_panelle' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="blog-title">Title:</label>
+                <input type="text" name="title" id="blog-title" placeholder="Enter blog title" required>
+            </div>
+            <div class="form-group">
+                <label for="blog-category">Category:</label>
+                <select name="category" id="blog-category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="blog-description">Description:</label>
+                <textarea name="description" id="blog-description" placeholder="Enter blog description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="blog-image">Image:</label>
+                <input type="file" name="image" id="blog-image" required>
+            </div>
+            <button type="submit" name="add_blog">Save</button>
+        </form>
+    </div>
+
+    
+
+    <div id="product-form">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'aibh:admin_panelle' %}">
+            {% csrf_token %}
+    
+            <!-- Champs existants -->
+            <div class="form-group">
+                <label for="product-name">Name:</label>
+                <input type="text" name="name" id="product-name" placeholder="Enter product name" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="product-category">Category:</label>
+                <select name="category" id="product-category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="product-description">Description:</label>
+                <textarea name="description" id="product-description" placeholder="Enter product description" required></textarea>
+            </div>
+    
+            <div class="form-group">
+                <label for="product-price-commercial">Price (Commercial):</label>
+                <input type="number" name="price_commercial" id="product-price-commercial" placeholder="Enter commercial price" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="product-price-partner">Price (Partner):</label>
+                <input type="number" name="price_partner" id="product-price-partner" placeholder="Enter partner price" required>
+            </div>
+
+             <!-- Champs supplémentaires pour les produits étrangers -->
+             <div class="form-group" id="foreign-product-fields">
+                <label for="product-marge">Marge:</label>
+                <input type="number" name="marge" id="product-marge" placeholder="Enter margin">
+
+                <label for="product-prix-livraison">Prix de Livraison:</label>
+                <input type="number" name="prix_livraison" id="product-prix-livraison" placeholder="Enter shipping price">
+            </div>
+    
+            <div class="form-group">
+                <label for="product-image">Image:</label>
+                <input type="file" name="image" id="product-image" required>
+            </div>
+            <!-- Nouveau champ Type de Produit -->
+            <div class="form-group">
+                <label for="product-type">Type de Produit:</label>
+                <select name="product_type" id="product-type" required>
+                    {% for value, label in product_type_choices %}
+                        <option value="{{ value }}" {% if value == product.product_type %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" name="add_product">Save</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Formulaire caché pour l'ajout de catégorie -->
+<div id="category-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <form method="POST" action="{% url 'aibh:add_category' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category-name">Nom de la Catégorie:</label>
+                <input type="text" name="name" id="category-name" placeholder="Entrez le nom de la catégorie" required>
+            </div>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    // Script JavaScript pour contrôler la modal d'ajout de catégorie
+document.addEventListener("DOMContentLoaded", function () {
+    const openCategoryFormBtn = document.getElementById("open-category-form");
+    const categoryModal = document.getElementById("category-modal");
+    const closeCategoryModalBtn = categoryModal.querySelector(".close-button");
+
+    // Fonction pour ouvrir la modal
+    openCategoryFormBtn.addEventListener("click", function () {
+        categoryModal.style.display = "flex"; // Afficher la modal
+    });
+
+    // Fonction pour fermer la modal
+    closeCategoryModalBtn.addEventListener("click", function () {
+        categoryModal.style.display = "none"; // Cacher la modal
+    });
+
+    // Fermer la modal si l'utilisateur clique en dehors du contenu de la modal
+    window.addEventListener("click", function (event) {
+        if (event.target == categoryModal) {
+            categoryModal.style.display = "none";
+        }
+    });
+});
+
+</script>
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const menuIcon = document.getElementById("menu-icon");
+        const nav = document.querySelector("nav ul");
+
+        menuIcon.addEventListener("click", function () {
+            nav.classList.toggle("active");
+        });
+
+        const addBlogCard = document.getElementById("add-blog");
+        const addProductCard = document.getElementById("add-product");
+        const modal = document.getElementById("modal");
+        const modalContent = document.getElementById("modal-form-content");
+        const closeButton = document.querySelector(".close-button");
+
+        function openModal(title, formId) {
+            modal.style.display = "flex"; // Utiliser 'flex' pour centrer la modal
+            const formContent = document.getElementById(formId).innerHTML;
+            modalContent.innerHTML = `<span class="close-button">&times;</span><h2>${title}</h2>${formContent}`;
+            closeButton.addEventListener("click", closeModal);
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            modalContent.innerHTML = '';
+        }
+
+        addBlogCard.addEventListener("click", function () {
+            openModal("Ajouter Un Article de Blog", "blog-form");
+        });
+
+        addProductCard.addEventListener("click", function () {
+            openModal("Ajouter Un Produit", "product-form");
+        });
+
+        const errorMessage = document.getElementById("error-message");
+        const adminPanel = document.querySelector(".admin-panel");
+
+        function checkScreenSize() {
+            if (window.innerWidth >= 768) {
+                errorMessage.style.display = "none";
+                adminPanel.style.display = "block";
+            } else {
+                errorMessage.style.display = "block";
+                adminPanel.style.display = "none";
+            }
+        }
+
+        checkScreenSize();
+        window.addEventListener("resize", checkScreenSize);
+    });
+</script>
+
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section logo-section">
+            <img src="{% static 'logo.png' %}" alt="Logo AIBH Market" class="footer-logo">
+        </div>product_type
+        <div class="footer-section contact-section">
+            <h3>Contact</h3>
+            <p>Pour nous joindre : WhatsApp +226 67207272, +226 60705634</p>
+            <p>OUAGADOUGOU, BURKINA FASO</p>
+        </div>
+        <div class="footer-section social-media-section">
+            <h3>Suivez-nous</h3>
+            <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <div class="footer-section thanks-section">
+            <p>&copy; 2024 AIBH Market. Tous droits réservés.</p>
+        </div>
+    </div>
+</footer>
+</body>
+<style>
+
+    .card{
+        margin: 5px;
+        width: 20%;
+    }
+    /* Style pour la modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* Couleur de fond légèrement transparente */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style pour le contenu de la modal */
+.modal-content {
+    background-color: #fff;
+    margin-bottom: 100px;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+    max-width: 600px; /* Limite maximale de largeur */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2); /* Ombre pour un effet de profondeur */
+}
+
+/* Style pour le bouton de fermeture */
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Style pour les formulaires dans la modal */
+.modal form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal .form-group {
+    margin-bottom: 15px;
+}
+
+.modal .form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.modal .form-group button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal .form-group button:hover {
+    background-color: #218838;
+}
+
+
+#open-category-form{
+    font-size: 25px;
+    font-weight: bolder;
+    width: 100%;
+    height: 70%;
+    background-color: #014101;
+    border: none;
+    color: white;
+}
+
+</style>
+</html>
